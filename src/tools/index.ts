@@ -9,6 +9,7 @@ export { grepTool } from './grep.js';
 export { globTool } from './glob.js';
 export { fetchTool } from './fetch.js';
 export { gitStatusTool, gitDiffTool, gitLogTool, gitCommitTool, gitBranchTool, gitPushTool, gitStashTool, gitTools } from './git.js';
+export { webSearchTool } from './web-search.js';
 
 import { bashTool } from './bash.js';
 import { fileReadTool } from './file-read.js';
@@ -19,14 +20,15 @@ import { grepTool } from './grep.js';
 import { globTool } from './glob.js';
 import { fetchTool } from './fetch.js';
 import { gitTools } from './git.js';
+import { webSearchTool } from './web-search.js';
 
 export function getDefaultTools(): Tool[] {
   return [bashTool, fileReadTool, fileWriteTool, fileEditTool, lsTool, grepTool, globTool, fetchTool];
 }
 
-/** All default tools + git tools. */
+/** All default tools + git tools + web search. */
 export function getAllTools(): Tool[] {
-  return [...getDefaultTools(), ...gitTools];
+  return [...getDefaultTools(), ...gitTools, webSearchTool];
 }
 
 export function getReadOnlyTools(): Tool[] {
