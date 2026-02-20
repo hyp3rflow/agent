@@ -1,6 +1,6 @@
 import { spawn, type ChildProcess } from 'node:child_process';
 import { nanoid } from 'nanoid';
-import type { Tool, ToolContext, ToolResult } from './types.js';
+import type { Tool, ToolContext, ToolResult } from '../core/types.js';
 
 interface JsonRpcRequest {
   jsonrpc: '2.0';

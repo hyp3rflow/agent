@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Sandbox, SandboxError } from '../src/sandbox.js';
+import { Sandbox, SandboxError } from '../src/sandbox/sandbox.js';
 
 describe('Sandbox', () => {
   const makeSandbox = (overrides?: Record<string, any>) =>

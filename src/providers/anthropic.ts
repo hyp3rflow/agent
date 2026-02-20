@@ -2,7 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import type {
   Provider, ProviderOptions, ProviderEvent,
   Message, ToolCall, TokenUsage, FinishReason,
-} from '../types.js';
+} from '../core/types.js';
 
 export class AnthropicProvider implements Provider {
   readonly name = 'anthropic';

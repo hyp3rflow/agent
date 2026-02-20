@@ -3,9 +3,9 @@
  * Provides queryable snapshots of running/completed workflows.
  */
 
-import { EventBus } from './events.js';
+import { EventBus } from '../core/events.js';
 import { Workflow, type WorkflowSchema, type WorkflowEvent, type WorkflowResult } from './workflow.js';
-import type { AgentEvent, TokenUsage } from './types.js';
+import type { AgentEvent, TokenUsage } from '../core/types.js';
 
 export interface WorkflowRunInfo {
   id: string;

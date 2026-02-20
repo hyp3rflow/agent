@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { Agent } from '../src/agent.js';
-import { InMemorySession } from '../src/session.js';
+import { Agent } from '../src/core/agent.js';
+import { InMemorySession } from '../src/core/session.js';
 import type {
   Provider, ProviderOptions, ProviderEvent, Message,
   Tool, ToolContext, ToolResult, AgentEvent,
-} from '../src/types.js';
+} from '../src/core/types.js';
 
 // --- Mock Provider ---
 function mockProvider(responses: Array<{

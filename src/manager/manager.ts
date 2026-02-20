@@ -1,12 +1,12 @@
 import { nanoid } from 'nanoid';
-import { Agent } from './agent.js';
-import { EventBus } from './events.js';
-import { InMemorySession } from './session.js';
-import { Sandbox } from './sandbox.js';
-import type { SandboxConfig } from './sandbox.js';
+import { Agent } from '../core/agent.js';
+import { EventBus } from '../core/events.js';
+import { InMemorySession } from '../core/session.js';
+import { Sandbox } from '../sandbox/sandbox.js';
+import type { SandboxConfig } from '../sandbox/sandbox.js';
 import type {
   AgentConfig, AgentEvent, RunOptions, Session, TokenUsage,
-} from './types.js';
+} from '../core/types.js';
 
 export interface AgentInfo {
   id: string;

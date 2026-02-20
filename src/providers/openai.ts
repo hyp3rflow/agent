@@ -2,7 +2,7 @@ import OpenAI from 'openai';
 import type {
   Provider, ProviderOptions, ProviderEvent,
   Message, ToolCall, TokenUsage, FinishReason,
-} from '../types.js';
+} from '../core/types.js';
 
 export class OpenAIProvider implements Provider {
   readonly name = 'openai';

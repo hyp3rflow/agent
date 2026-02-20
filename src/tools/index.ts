@@ -1,4 +1,4 @@
-import type { Tool } from '../types.js';
+import type { Tool } from '../core/types.js';
 
 export { bashTool } from './bash.js';
 export { fileReadTool } from './file-read.js';

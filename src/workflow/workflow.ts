@@ -13,19 +13,19 @@
  */
 
 import { nanoid } from 'nanoid';
-import { Agent } from './agent.js';
-import { AgentManager } from './manager.js';
-import { EventBus } from './events.js';
-import { InMemorySession } from './session.js';
-import { Sandbox } from './sandbox.js';
+import { Agent } from '../core/agent.js';
+import { AgentManager } from '../manager/manager.js';
+import { EventBus } from '../core/events.js';
+import { InMemorySession } from '../core/session.js';
+import { Sandbox } from '../sandbox/sandbox.js';
 import type {
   Provider,
   Tool,
   AgentEvent,
   Session,
   TokenUsage,
-} from './types.js';
-import type { SandboxConfig } from './sandbox.js';
+} from '../core/types.js';
+import type { SandboxConfig } from '../sandbox/sandbox.js';
 
 // ─── Workflow Schema ───
 

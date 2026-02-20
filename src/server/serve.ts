@@ -4,7 +4,7 @@
  * Usage: npx tsx src/serve.ts [--port 7777]
  */
 import { serve } from '@hono/node-server';
-import { AgentManager } from './manager.js';
+import { AgentManager } from '../manager/manager.js';
 import { createServer } from './server.js';
 
 const port = Number(process.argv.find((_, i, a) => a[i - 1] === '--port') ?? 7777);

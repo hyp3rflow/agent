@@ -2,7 +2,7 @@
  * Smoke test: Agent + AnthropicProvider + bash tool
  * Run: npx tsx test/smoke.ts
  */
-import { Agent } from '../src/agent.js';
+import { Agent } from '../src/core/agent.js';
 import { AnthropicProvider } from '../src/providers/anthropic.js';
 import { bashTool } from '../src/tools/bash.js';
 

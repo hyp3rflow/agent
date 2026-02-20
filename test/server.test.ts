@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { AgentManager } from '../src/manager.js';
-import { createServer } from '../src/server.js';
-import type { Provider, ProviderEvent, Message, ProviderOptions } from '../src/types.js';
+import { AgentManager } from '../src/manager/manager.js';
+import { createServer } from '../src/server/server.js';
+import type { Provider, ProviderEvent, Message, ProviderOptions } from '../src/core/types.js';
 
 function mockProvider(content: string): Provider {
   return {

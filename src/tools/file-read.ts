@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import type { Tool, ToolContext, ToolResult } from '../types.js';
+import type { Tool, ToolContext, ToolResult } from '../core/types.js';
 
 const MAX_BYTES = 50 * 1024;
 

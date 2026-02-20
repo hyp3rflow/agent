@@ -1,9 +1,9 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { streamSSE } from 'hono/streaming';
-import type { AgentManager, ManagerEvent } from './manager.js';
-import type { WorkflowManager } from './workflow-manager.js';
-import type { WorkflowEvent } from './workflow.js';
+import type { AgentManager, ManagerEvent } from '../manager/manager.js';
+import type { WorkflowManager } from '../workflow/workflow-manager.js';
+import type { WorkflowEvent } from '../workflow/workflow.js';
 
 export interface ServerOptions {
   manager?: AgentManager;

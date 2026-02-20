@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { Workflow, defineWorkflow } from '../src/workflow.js';
-import type { WorkflowSchema, WorkflowEvent, WorkflowResult } from '../src/workflow.js';
-import type { Provider, ProviderEvent, Message, ProviderOptions, Tool, ToolContext, ToolResult } from '../src/types.js';
+import { Workflow, defineWorkflow } from '../src/workflow/workflow.js';
+import type { WorkflowSchema, WorkflowEvent, WorkflowResult } from '../src/workflow/workflow.js';
+import type { Provider, ProviderEvent, Message, ProviderOptions, Tool, ToolContext, ToolResult } from '../src/core/types.js';
 
 // ─── Mock Provider ───
 

@@ -1,4 +1,4 @@
-import type { Tool, ToolContext, ToolResult } from '../types.js';
+import type { Tool, ToolContext, ToolResult } from '../core/types.js';
 
 const MAX_CHARS = 50000;
 

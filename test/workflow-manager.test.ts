@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { WorkflowManager } from '../src/workflow-manager.js';
-import { createServer } from '../src/server.js';
-import type { Provider, ProviderEvent } from '../src/types.js';
-import type { WorkflowSchema } from '../src/workflow.js';
+import { WorkflowManager } from '../src/workflow/workflow-manager.js';
+import { createServer } from '../src/server/server.js';
+import type { Provider, ProviderEvent } from '../src/core/types.js';
+import type { WorkflowSchema } from '../src/workflow/workflow.js';
 
 function mockProvider(responses: Array<{
   content?: string;

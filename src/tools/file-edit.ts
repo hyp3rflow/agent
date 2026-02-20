@@ -1,6 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import type { Tool, ToolContext, ToolResult } from '../types.js';
+import type { Tool, ToolContext, ToolResult } from '../core/types.js';
 
 export const fileEditTool: Tool = {
   name: 'file_edit',

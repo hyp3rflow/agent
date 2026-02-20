@@ -1,6 +1,6 @@
 import { writeFile, mkdir } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
-import type { Tool, ToolContext, ToolResult } from '../types.js';
+import type { Tool, ToolContext, ToolResult } from '../core/types.js';
 
 export const fileWriteTool: Tool = {
   name: 'file_write',

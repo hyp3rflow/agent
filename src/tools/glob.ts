@@ -1,6 +1,6 @@
 import { readdir } from 'node:fs/promises';
 import { resolve, join, relative } from 'node:path';
-import type { Tool, ToolContext, ToolResult } from '../types.js';
+import type { Tool, ToolContext, ToolResult } from '../core/types.js';
 
 const IGNORE = new Set(['node_modules', '.git', '.next', '.cache', 'dist', '__pycache__', '.venv']);
 const MAX_RESULTS = 1000;
