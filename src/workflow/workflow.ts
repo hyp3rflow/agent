@@ -26,6 +26,50 @@ import type {
   TokenUsage,
 } from '../core/types.js';
 import type { SandboxConfig } from '../sandbox/sandbox.js';
+import { gitTools as builtinGitTools } from '../tools/git.js';
+
+// ─── Git Workflow Config ───
+
+export interface GitWorkflowConfig {
+  /** Path to the git repository root. Defaults to sandbox.rootDir or cwd. */
+  repoDir?: string;
+
+  /** Branch strategy when a workflow run starts. */
+  branch?: {
+    /** Create a new branch for this run. The name can include {runId}, {name}, {date} placeholders. */
+    create?: string;
+    /** Base ref to branch from (default: current HEAD). */
+    from?: string;
+    /** Switch to an existing branch instead of creating. */
+    checkout?: string;
+  };
+
+  /** Auto-commit strategy. */
+  commit?: {
+    /** When to auto-commit: 'on-complete' (default), 'per-iteration', 'never'. */
+    strategy?: 'on-complete' | 'per-iteration' | 'never';
+    /** Commit message template. Supports {name}, {runId}, {status} placeholders. */
+    messageTemplate?: string;
+    /** Whether to stage all changes or only tracked files. Default: true (all). */
+    stageAll?: boolean;
+  };
+
+  /** Auto-push after commit. */
+  push?: {
+    /** Enable auto-push. Default: false. */
+    enabled?: boolean;
+    /** Remote name. Default: 'origin'. */
+    remote?: string;
+    /** Set upstream on first push. Default: true. */
+    setUpstream?: boolean;
+  };
+
+  /** Stash uncommitted changes before starting, restore on error. Default: false. */
+  stashBeforeRun?: boolean;
+
+  /** Include git tools (status, diff, log, commit, branch, push, stash) automatically. Default: true. */
+  includeGitTools?: boolean;
+}
 
 // ─── Workflow Schema ───
 
@@ -56,6 +100,9 @@ export interface WorkflowSchema {
 
   /** Sandbox constraints applied to all agents in this workflow. */
   sandbox?: SandboxConfig;
+
+  /** Git workflow configuration — branch strategy, auto-commit, auto-push. */
+  git?: GitWorkflowConfig;
 
   /** Sub-agent policy — controls dynamic agent spawning inside the workflow. */
   delegation?: {
@@ -117,6 +164,28 @@ export interface WorkflowEvent {
   timestamp: number;
 }
 
+// ─── Git Helpers ───
+
+function resolveGitDir(schema: WorkflowSchema): string {
+  return schema.git?.repoDir ?? schema.sandbox?.rootDir ?? process.cwd();
+}
+
+function expandTemplate(template: string, vars: Record<string, string>): string {
+  return template.replace(/\{(\w+)\}/g, (_, key) => vars[key] ?? `{${key}}`);
+}
+
+async function execGit(args: string[], cwd: string): Promise<{ ok: boolean; output: string }> {
+  const { spawn } = await import('node:child_process');
+  return new Promise((resolve) => {
+    let out = '';
+    const proc = spawn('git', args, { cwd, env: { ...process.env, GIT_TERMINAL_PROMPT: '0' } });
+    proc.stdout.on('data', (d) => { out += d; });
+    proc.stderr.on('data', (d) => { out += d; });
+    proc.on('close', (code) => resolve({ ok: code === 0, output: out.trim() }));
+    proc.on('error', (err) => resolve({ ok: false, output: err.message }));
+  });
+}
+
 // ─── Workflow Runtime ───
 
 export class Workflow {
@@ -165,6 +234,33 @@ export class Workflow {
       await this.schema.beforeRun(ctx);
     }
 
+    // ─── Git lifecycle: setup ───
+    const gitConf = this.schema.git;
+    const gitDir = resolveGitDir(this.schema);
+    let gitStashed = false;
+
+    if (gitConf) {
+      // Stash uncommitted changes if requested
+      if (gitConf.stashBeforeRun) {
+        const { ok } = await execGit(['stash', 'push', '-m', `tycoon-run-${runId}`], gitDir);
+        if (ok) gitStashed = true;
+      }
+
+      // Branch setup
+      if (gitConf.branch?.create) {
+        const branchName = expandTemplate(gitConf.branch.create, {
+          runId, name: this.schema.name, date: new Date().toISOString().slice(0, 10),
+        });
+        const args = ['checkout', '-b', branchName];
+        if (gitConf.branch.from) args.push(gitConf.branch.from);
+        await execGit(args, gitDir);
+        ctx.state._gitBranch = branchName;
+      } else if (gitConf.branch?.checkout) {
+        await execGit(['checkout', gitConf.branch.checkout], gitDir);
+        ctx.state._gitBranch = gitConf.branch.checkout;
+      }
+    }
+
     // Resolve default provider
     const mainProvider = this.schema.providers[this.schema.defaultProvider];
     if (!mainProvider) {
@@ -190,9 +286,11 @@ export class Workflow {
       extraTools.push(this.buildDelegationTool(ctx, mainProvider));
     }
 
-    // Combine tools
+    // Combine tools — include git tools if git config present and not opted out
+    const includeGit = gitConf && gitConf.includeGitTools !== false;
     const allTools = [
       ...(this.schema.tools ?? []),
+      ...(includeGit ? builtinGitTools : []),
       ...extraTools,
     ];
 
@@ -242,6 +340,31 @@ export class Workflow {
         }
 
         if (event.type === 'done') {
+          // ─── Git lifecycle: commit/push on completion ───
+          if (gitConf && gitConf.commit?.strategy !== 'never') {
+            const commitMsg = expandTemplate(
+              gitConf.commit?.messageTemplate ?? 'chore({name}): run {runId} — {status}',
+              { runId, name: this.schema.name, status: 'completed' },
+            );
+            const stageAll = gitConf.commit?.stageAll !== false;
+            if (stageAll) await execGit(['add', '-A'], gitDir);
+            // Only commit if there are changes
+            const { ok: hasChanges } = await execGit(['diff', '--cached', '--quiet'], gitDir);
+            if (!hasChanges) {
+              await execGit(['commit', '-m', commitMsg], gitDir);
+              if (gitConf.push?.enabled) {
+                const remote = gitConf.push.remote ?? 'origin';
+                const pushArgs = ['push'];
+                if (gitConf.push.setUpstream !== false && ctx.state._gitBranch) {
+                  pushArgs.push('-u', remote, ctx.state._gitBranch as string);
+                } else {
+                  pushArgs.push(remote);
+                }
+                await execGit(pushArgs, gitDir);
+              }
+            }
+          }
+
           const result: WorkflowResult = {
             runId,
             status: event.finishReason === 'canceled' ? 'canceled' : 'completed',
@@ -265,6 +388,10 @@ export class Workflow {
         }
       }
     } catch (err) {
+      // Restore stash on error
+      if (gitStashed) {
+        await execGit(['stash', 'pop'], gitDir);
+      }
       const error = err instanceof Error ? err : new Error(String(err));
       const result: WorkflowResult = {
         runId,
@@ -314,6 +441,17 @@ export class Workflow {
         `File operations are restricted to: ${this.schema.sandbox.rootDir}. ` +
         `Some commands may require permission approval.`
       );
+    }
+
+    if (this.schema.git) {
+      const g = this.schema.git;
+      const gitParts = [`You are working in a git repository at: ${resolveGitDir(this.schema)}.`];
+      gitParts.push(`Git tools (git_status, git_diff, git_log, git_commit, git_branch, git_push, git_stash) are available.`);
+      if (g.branch?.create) gitParts.push(`A feature branch will be created automatically for this run.`);
+      if (g.commit?.strategy === 'on-complete') gitParts.push(`Changes will be auto-committed on completion.`);
+      if (g.commit?.strategy === 'per-iteration') gitParts.push(`Commit your work incrementally as you make progress.`);
+      if (g.push?.enabled) gitParts.push(`Commits will be auto-pushed to remote.`);
+      parts.push(gitParts.join(' '));
     }
 
     return parts.join('\n\n');

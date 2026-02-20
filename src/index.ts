@@ -30,7 +30,7 @@ export type { AgentInfo, RunInfo, ManagerEvent, RegisterOptions } from './manage
 
 // Workflow
 export { Workflow, defineWorkflow } from './workflow/workflow.js';
-export type { WorkflowSchema, WorkflowContext, WorkflowResult, WorkflowEvent } from './workflow/workflow.js';
+export type { WorkflowSchema, WorkflowContext, WorkflowResult, WorkflowEvent, GitWorkflowConfig } from './workflow/workflow.js';
 export { WorkflowManager } from './workflow/workflow-manager.js';
 export type { WorkflowRunInfo, SubAgentInfo } from './workflow/workflow-manager.js';
 

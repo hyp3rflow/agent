@@ -6,7 +6,7 @@ Minimal TypeScript agent framework with streaming LLM, tool execution, workflows
 
 - **Agent loop** — Streaming responses, automatic tool execution, configurable max turns
 - **Providers** — Anthropic and OpenAI with streaming + tool call support
-- **Built-in tools** — bash, file-read, file-write, file-edit, ls, grep, glob, fetch
+- **Built-in tools** — bash, file-read/write/edit, ls, grep, glob, fetch, 7 git tools
 - **Sub-agents** — Wrap any agent as a tool with `agent.asTool()`
 - **Workflows** — Declarative multi-agent orchestration with delegation, hooks, and sandbox constraints
 - **WorkflowManager** — Track workflow runs, sub-agent lifecycle, and events
@@ -247,6 +247,7 @@ Detailed API docs in [`docs/`](./docs/):
 - [Manager](./docs/manager.md) — AgentManager, WorkflowManager
 - [Sandbox](./docs/sandbox.md) — SandboxConfig, permissions, path/command/network validation
 - [Server](./docs/server.md) — Full endpoint reference, ServerOptions, SSE
+- [Git Workflow](./docs/git-workflow.md) — Git lifecycle config, 7 git tools
 - [MCP](./docs/mcp.md) — MCP client usage
 - [Sessions](./docs/sessions.md) — InMemorySession, PersistentSession
 
