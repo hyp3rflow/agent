@@ -1,8 +1,14 @@
-import { readFile } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import type { Tool, ToolContext, ToolResult } from '../core/types.js';
 
 const MAX_BYTES = 50 * 1024;
+
+/**
+ * In-memory file timestamp tracker.
+ * Tracks mtime at read time so write/edit can detect stale overwrites.
+ */
+export const fileTimestamps = new Map<string, number>();
 
 export const fileReadTool: Tool = {
   name: 'file_read',
@@ -27,6 +33,10 @@ Use this to examine source code, configuration files, logs, or any text file.`,
     const limit = params.limit;
 
     try {
+      // Track mtime for stale-write detection
+      const st = await stat(filePath);
+      fileTimestamps.set(filePath, st.mtimeMs);
+
       const raw = await readFile(filePath, 'utf-8');
       if (Buffer.byteLength(raw) > MAX_BYTES && !limit) {
         const lines = raw.split('\n');

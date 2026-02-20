@@ -1,10 +1,12 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, stat } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import type { Tool, ToolContext, ToolResult } from '../core/types.js';
+import { fileTimestamps } from './file-read.js';
 
 export const fileEditTool: Tool = {
   name: 'file_edit',
   description: `Make a surgical edit to a file by replacing exact text. The oldText must match exactly (including whitespace and indentation).
+Verifies the file hasn't been modified externally since last read (stale-write protection).
 Use this for precise edits to existing files. For creating new files or full rewrites, use file_write instead.
 The tool will error if oldText is not found or appears multiple times (ambiguous match).`,
   parameters: {
@@ -22,6 +24,18 @@ The tool will error if oldText is not found or appears multiple times (ambiguous
     const filePath = resolve(context.workingDirectory ?? process.cwd(), params.path);
 
     try {
+      // Stale-write check
+      const knownMtime = fileTimestamps.get(filePath);
+      if (knownMtime !== undefined) {
+        const st = await stat(filePath);
+        if (st.mtimeMs !== knownMtime) {
+          return {
+            content: `Error: file ${params.path} has been modified externally since last read (expected mtime ${new Date(knownMtime).toISOString()}, got ${new Date(st.mtimeMs).toISOString()}). Re-read the file before editing.`,
+            isError: true,
+          };
+        }
+      }
+
       const content = await readFile(filePath, 'utf-8');
       const { oldText, newText } = params;
 
@@ -42,6 +56,13 @@ The tool will error if oldText is not found or appears multiple times (ambiguous
 
       const updated = content.replace(oldText, newText);
       await writeFile(filePath, updated, 'utf-8');
+
+      // Update tracked mtime
+      try {
+        const st = await stat(filePath);
+        fileTimestamps.set(filePath, st.mtimeMs);
+      } catch { /* ignore */ }
+
       return { content: `Edited ${params.path}` };
     } catch (err: any) {
       return { content: `Error editing file: ${err.message}`, isError: true };
