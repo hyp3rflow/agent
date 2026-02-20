@@ -10,6 +10,8 @@ export { globTool } from './glob.js';
 export { fetchTool } from './fetch.js';
 export { gitStatusTool, gitDiffTool, gitLogTool, gitCommitTool, gitBranchTool, gitPushTool, gitStashTool, gitTools } from './git.js';
 export { webSearchTool } from './web-search.js';
+export { patchTool } from './patch.js';
+export { sourcegraphTool } from './sourcegraph.js';
 
 import { bashTool } from './bash.js';
 import { fileReadTool } from './file-read.js';
@@ -21,14 +23,16 @@ import { globTool } from './glob.js';
 import { fetchTool } from './fetch.js';
 import { gitTools } from './git.js';
 import { webSearchTool } from './web-search.js';
+import { patchTool } from './patch.js';
+import { sourcegraphTool } from './sourcegraph.js';
 
 export function getDefaultTools(): Tool[] {
-  return [bashTool, fileReadTool, fileWriteTool, fileEditTool, lsTool, grepTool, globTool, fetchTool];
+  return [bashTool, fileReadTool, fileWriteTool, fileEditTool, patchTool, lsTool, grepTool, globTool, fetchTool];
 }
 
-/** All default tools + git tools + web search. */
+/** All default tools + git + web search + sourcegraph. */
 export function getAllTools(): Tool[] {
-  return [...getDefaultTools(), ...gitTools, webSearchTool];
+  return [...getDefaultTools(), ...gitTools, webSearchTool, sourcegraphTool];
 }
 
 export function getReadOnlyTools(): Tool[] {
