@@ -207,11 +207,22 @@ export class Workflow {
       temperature: this.schema.main.temperature,
     });
 
+    // Buffer events from ctx.bus (sub-agent spawns, completions, etc.)
+    const busBuffer: (WorkflowEvent & { result?: WorkflowResult })[] = [];
+    const unsubBus = ctx.bus.on('*', (event) => {
+      busBuffer.push(event);
+    });
+
     try {
       for await (const event of mainAgent.run(prompt, {
         session,
         signal: options?.signal,
       })) {
+        // Drain bus buffer first (sub-agent events that fired during tool execution)
+        while (busBuffer.length > 0) {
+          yield busBuffer.shift()!;
+        }
+
         // Forward agent events
         yield {
           type: 'agent:event',
@@ -272,6 +283,12 @@ export class Workflow {
         timestamp: Date.now(),
         result,
       };
+    } finally {
+      // Drain remaining bus events
+      while (busBuffer.length > 0) {
+        yield busBuffer.shift()!;
+      }
+      unsubBus();
     }
   }
 

@@ -8,8 +8,11 @@ export type { AgentInfo, RunInfo, ManagerEvent, RegisterOptions } from './manage
 export { Sandbox, SandboxError } from './sandbox.js';
 export type { SandboxConfig, SandboxStatus, PermissionRequest, PermissionRecord } from './sandbox.js';
 export { createServer } from './server.js';
+export type { ServerOptions } from './server.js';
 export { Workflow, defineWorkflow } from './workflow.js';
 export type { WorkflowSchema, WorkflowContext, WorkflowResult, WorkflowEvent } from './workflow.js';
+export { WorkflowManager } from './workflow-manager.js';
+export type { WorkflowRunInfo, SubAgentInfo } from './workflow-manager.js';
 export type {
   AgentConfig,
   AgentEvent,
