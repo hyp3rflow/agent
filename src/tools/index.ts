@@ -12,6 +12,7 @@ export { gitStatusTool, gitDiffTool, gitLogTool, gitCommitTool, gitBranchTool, g
 export { webSearchTool } from './web-search.js';
 export { patchTool } from './patch.js';
 export { sourcegraphTool } from './sourcegraph.js';
+export { createLspTools } from './lsp.js';
 
 import { bashTool } from './bash.js';
 import { fileReadTool } from './file-read.js';

@@ -42,5 +42,8 @@ export type { SandboxConfig, SandboxStatus, PermissionRequest, PermissionRecord 
 export { createServer } from './server/server.js';
 export type { ServerOptions } from './server/server.js';
 
+// LSP
+export { LspManager, LspClient, type LspManagerOptions, type LspClientConfig, type LspDiagnostic, type LspLocation } from './lsp/index.js';
+
 // MCP
 export { MCP } from './mcp/index.js';
